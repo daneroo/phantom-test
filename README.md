@@ -36,5 +36,9 @@ See http://veeraramkumar.blogspot.com/2011_06_01_archive.html
 Do the following
 
     apt-get install xfonts-100dpi xfonts-75dpi xfonts-scalable xfonts-cyrillic
-    apt-get install x-ttcidfont-conf
+
+That removes the warnings except for ttcid fonts?
+
+    [dix] Could not init font path element /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType, removing from list!
+    
     
