@@ -1,0 +1,91 @@
+<html class="ui-mobile landscape min-width-320px min-width-480px min-width-768px min-width-1024px">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, minimum-scale=1, maximum-scale=1" name="viewport"> 
+    <title>ekomobi</title>
+    <link href="http://code.jquery.com/mobile/1.0b1/jquery.mobile-1.0b1.min.css" rel="stylesheet">
+    <!-- jqM-latest is too flaky
+    <link href="http://code.jquery.com/mobile/latest/jquery.mobile.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="http://jquerymobile.com/test/themes/valencia/">
+    <link href="http://jquerymobile.com/test/themes/valencia/" rel="stylesheet" id="themeoverride">
+    -->
+</head>        
+<body class="ui-mobile-viewport">
+    <div id="thumb" data-role="page" data-theme="d">
+        <div data-role="header" data-position="fixed" >
+            <h1>Header</h1>
+        </div>
+
+        <div data-role="content" class="ui-content" role="main">
+            <h2><span id="theme">A</span> theme</h2>
+            <h4> variant <span id="swatch">A</span></h4>
+            <div>This is a sample.</div>
+            <div data-role="fieldcontain">
+                <fieldset data-role="controlgroup" data-type="horizontal">
+                    <input type="radio" name="radio-choice-1" id="radio-choice-1" value="choice-1" checked="checked" />
+                    <label for="radio-choice-1">Yes</label>
+
+                    <input type="radio" name="radio-choice-1" id="radio-choice-2" value="choice-2"  />
+                    <label for="radio-choice-2">No</label>
+                </fieldset>
+            </div>
+        </div>
+
+        <div data-role="footer" data-id="footer1" data-position="fixed">
+            <div data-role="navbar">
+                <ul>
+                    <li><a href="#thumb" data-icon="home">A</a></li>
+                    <li><a href="#thumb" class="ui-btn-active ui-state-persist" data-icon="gear">B</a></li>
+                    <li><a href="#thumb" data-icon="star">C</a></li>
+                </ul>
+            </div><!-- /navbar -->
+        </div><!-- /footer -->
+
+    </div>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/json2/20110223/json2.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    function applyTheme(themeName,swatch){
+        themeName = themeName || 'default';
+        console.log(['theme',themeName,swatch].join(':'));
+        // set the theme
+        // 1- reset default theme
+        if ($('#themeoverride').length>0){
+            $('#themeoverride').remove();
+        }
+        // override if appropriate
+        if (themeName!=="default"){
+            var themesDir = 'http://jquerymobile.com/test/themes/';
+            $('head').append( '<link id="themeoverride" rel=\'stylesheet\' href=\''+ themesDir + themeName +'/\' />' );
+        }
+
+        // set the swatch; if the swatch is not valid, remove data-theme attribute
+        var validSwatches = {a:true,b:true,c:true,d:true,e:true};
+        $('div[data-role=page]').each(function(){
+            $page = $(this);
+            if (validSwatches[swatch]){
+                $page.attr('data-theme',swatch);            
+            }
+        });
+    }
+    $(document).bind("mobileinit", function(){
+        console.log("params: "+JSON.stringify(window.location.search));
+        var defaultOptions = {name:"default",swatch:'none'};
+        var options = defaultOptions;
+        try {
+            var search = decodeURI(window.location.search.substring(1));
+            console.log('search: '+search);
+            var injected = JSON.parse(search);
+            options = $.extend(defaultOptions,injected);
+        } catch(err) {
+            console.log('bad params: using defaults')
+        }
+        console.log("using options: "+JSON.stringify(options));
+        $('#theme').text(options.name);
+        $('#swatch').text(options.swatch);
+        applyTheme(options.name,options.swatch);
+    });
+    </script>
+    <script src="http://code.jquery.com/mobile/1.0b1/jquery.mobile-1.0b1.min.js" type="text/javascript"></script>
+</body>
+</html>
