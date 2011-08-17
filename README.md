@@ -41,4 +41,8 @@ That removes the warnings except for ttcid fonts?
 
     [dix] Could not init font path element /var/lib/defoma/x-ttcidfont-conf.d/dirs/TrueType, removing from list!
     
-    
+
+## PDF Options
+As pdf rendering is a bit broken,... see the [wkhtmltopdf](https://github.com/antialize/wkhtmltopdf) project.
+This is what we use in ekomobi for QR-Code generation (pdf)
+
