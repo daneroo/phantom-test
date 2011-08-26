@@ -31,6 +31,7 @@ for t in default valencia; do
     for v in none a b c d e; do
         echo "###  theme $t : variant: $v";
         WPARAM="$BASE?{\"name\":\"$t\",\"swatch\":\"$v\"}"
+        echo $WPARAM
         $phantomjs thumbify.js $WPARAM tmp.png
         resizeImg tmp.png img/thumb-$t-$v.png
         rm tmp.png
