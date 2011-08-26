@@ -44,5 +44,9 @@ That removes the warnings except for ttcid fonts?
 
 ## PDF Options
 As pdf rendering is a bit broken,... see the [wkhtmltopdf](https://github.com/antialize/wkhtmltopdf) project.
-This is what we use in ekomobi for QR-Code generation (pdf)
+This is what we use in ekomobi for QR-Code generation (pdf).
+These are the dependancies for wkhtmltopdf static libs.
 
+    sudo aptitude install openssl build-essential xorg libssl-dev
+
+  
