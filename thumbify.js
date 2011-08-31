@@ -6,7 +6,7 @@ var page = new WebPage(),
     address, output, size;
 
 if (phantom.args.length < 2 || phantom.args.length > 3) {
-    console.log('Usage: thumbify.js URL');
+    console.log('Usage: thumbify.js URL output(.png)');
     phantom.exit();
 } else {
     address = phantom.args[0];
