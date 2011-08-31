@@ -25,6 +25,7 @@ if (phantom.args.length > 0) {
             window.setTimeout(function () {
                 page.render(output+'-'+globalPart+'.png');
                 console.log('  rendered '+output+'-'+globalPart+'.png');
+
                 if (globalPart=='home'){
                     var pages = page.evaluate(function(){ 
                         var pgs=[]; 
