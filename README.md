@@ -49,4 +49,7 @@ These are the dependancies for wkhtmltopdf static libs.
 
     sudo aptitude install openssl build-essential xorg libssl-dev
 
-  
+## Siteify:
+
+    phantomjs siteify.js |tee siteify.log; tail -1 siteify.log >siteify.json
+

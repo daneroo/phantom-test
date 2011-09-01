@@ -1,19 +1,17 @@
 // alias phantomjs=/Applications/phantomjs.app//Contents/MacOS/phantomjs
-// phantomjs thumbify.js file://`pwd`/ekothumb.html
-// phantomjs thumbify.js http://test.ekomobi.dev.axialdev.net/ coco.png
-// sips --resampleWidth 120 coco.png --out small-coco.png
-var page, address, output, size;
+// phantomjs siteify.js |tee siteify.log; tail -1 siteify.log >siteify.json
+// var page, address, output, size;
 
 var allSites = ['axialdev'];
+//var allSites = ['axialdev','sebastien', 'estrimont', 'lepresident'];
 var sitesFetched=false;
-var globalPart;
+var renderedSites=[];
 
 if (phantom.args.length > 0) {
-    console.log('Usage: thumbify.js URL output(.png)');
+    console.log('Usage: siteify.js');
     phantom.exit();
 } else {
-    address = phantom.args[0];
-    output = phantom.args[1];
+    
     function render(status) {
         if (status !== 'success') {
             console.log('Unable to load the address:'+status);
@@ -21,52 +19,68 @@ if (phantom.args.length > 0) {
             //eatParts();
         } else {
             console.log('  got: '+page.evaluate(function(){return ''+window.location;}));
-            //document.write('<script type="text/javascript" src="http://code.jquery.com/mobile/1.0b1/jquery.mobile-1.0b1.min.js"><\/script>');
             window.setTimeout(function () {
-                page.render(output+'-'+globalPart+'.png');
-                console.log('  rendered '+output+'-'+globalPart+'.png');
+                page.evaluate(function(){
+                    window.pagesLeft=[]; 
+                    $('div[data-role=page]').each(function(){
+                        pagesLeft.push($(this).attr('id') )
+                    });
+                    pagesLeft = pagesLeft.filter(function(val){ return (val!='photozoom' && val!='splash');});
+                });
 
-                if (globalPart=='home'){
-                    var pages = page.evaluate(function(){ 
-                        var pgs=[]; 
-                        $('div[data-role=page]').each(function(){
-                            pgs.push($(this).attr('id') )
-                        }); 
-                        return pgs;
-                     });
-                    pages = pages.filter(function(val){ return (val!='photozoom' && val!='home');});
-                    parts = parts.concat(pages);
-                    
-                    if (!sitesFetched){
-                        var sites = page.evaluate(function(){ 
-                            var sites=[]; 
-                            var o = $.ajax({  
-                              url: '/api/site', 
-                              dataType: 'json',  
-                              async: false,  
-                              success: function(otherSites){
-                                  otherSites.forEach(function(site){
-                                     sites.push(site.name); 
-                                  });
-                              }
-                            });
-                            sites = sites.filter(function(val){ return (val!='axialdev');});
-                            return sites; 
-                        });
-                        allSites = allSites.concat(sites);
-                        sitesFetched = true;
-                    }
+                var renderingSite = renderedSites[renderedSites.length-1];
+                renderingSite.pages=[];
+                while (true) {
+                    renderedPgId = page.evaluate(function(){
+                        if (pagesLeft.length==0) return '';
+
+                        $.mobile.defaultPageTransition='none';
+                        var pgId = pagesLeft.shift();
+                        $.mobile.changePage('#'+pgId);
+                        return pgId;
+                    });
+                    if (renderedPgId==='' || renderedPgId==null ) break;
+                    imageName = output+'-'+renderedPgId+'.png';
+                    console.log('  rendering '+imageName);
+                    page.render(imageName);
+                    renderingSite.pages.push(imageName);
                 }
-                eatParts();
+
+                if (!sitesFetched){
+                    var sites = page.evaluate(function(){ 
+                        var sites=[]; 
+                        var o = $.ajax({  
+                            url: '/api/site', 
+                            dataType: 'json',  
+                            async: false,  
+                            success: function(otherSites){
+                                otherSites.forEach(function(site){
+                                    sites.push(site.name); 
+                                });
+                            }
+                        });
+                        sites = sites.filter(function(val){ return (val!='axialdev');});
+                        return sites; 
+                    });
+                    allSites = allSites.concat(sites);
+                    sitesFetched = true;
+                }
+
+                eatSite();
+
             }, 500);
         }
     }
 
-    function eatParts(){
-        console.log('* Remaining pages '+JSON.stringify(parts));
-        if (parts.length>0){
-            globalPart = parts.shift();
-            var url = address+'#'+globalPart;
+    function eatSite(){
+        console.log('\n*** Remaining sites '+JSON.stringify(allSites)+'\n');
+        if (allSites.length>0){
+            address = allSites.shift();
+            renderedSites.push({name:address});
+            output='img/'+address;
+            //address = 'http://'+address+'.ekomobi.com/';
+            address = 'http://ekomobi.dev.axialdev.net/mobile.html?site='+address;
+            var url = address;
             console.log('  fetch: '+url);
             
             page = new WebPage();
@@ -75,23 +89,13 @@ if (phantom.args.length > 0) {
             };
             page.viewportSize = { width: 320, height: 480 };
             page.open(url, render );
-        } else {
-            console.log('we are done for the site: '+address);
-            eatSite();
-        }
-    }    
-    function eatSite(){
-        console.log('\n*** Remaining sites '+JSON.stringify(allSites)+'\n');
-        if (allSites.length>0){
-            address = allSites.shift();
-            output='img/'+address;
-            address = 'http://'+address+'.ekomobi.com/';
-            parts=['home'];
-            eatParts();
+
         } else {
             console.log('we are done done: ');
+            console.log(JSON.stringify(renderedSites));
             phantom.exit();
         }
     }
     eatSite();
+    
 }
