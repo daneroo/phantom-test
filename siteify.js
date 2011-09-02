@@ -78,8 +78,8 @@ if (phantom.args.length > 0) {
             address = allSites.shift();
             renderedSites.push({name:address});
             output='img/'+address;
-            //address = 'http://'+address+'.ekomobi.com/';
-            address = 'http://ekomobi.dev.axialdev.net/mobile.html?site='+address;
+            address = 'http://'+address+'.ekomobi.com/';
+            //address = 'http://ekomobi.dev.axialdev.net/mobile.html?site='+address;
             var url = address;
             console.log('  fetch: '+url);
             
